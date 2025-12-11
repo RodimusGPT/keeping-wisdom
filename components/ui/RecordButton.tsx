@@ -91,7 +91,12 @@ export function RecordButton({
   });
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      onPress={handlePress}
+      disabled={disabled}
+      activeOpacity={0.9}
+      style={styles.container}
+    >
       {/* Wave effect when recording */}
       {isRecording && (
         <Animated.View
@@ -118,10 +123,7 @@ export function RecordButton({
           },
         ]}
       >
-        <TouchableOpacity
-          onPress={handlePress}
-          disabled={disabled}
-          activeOpacity={0.8}
+        <View
           style={[
             styles.button,
             {
@@ -138,7 +140,7 @@ export function RecordButton({
             size={BUTTON_SIZE * 0.35}
             color="#FFFFFF"
           />
-        </TouchableOpacity>
+        </View>
       </Animated.View>
 
       {/* Audio level indicator */}
@@ -176,7 +178,7 @@ export function RecordButton({
       >
         {isRecording ? t('tapToStop') : t('tapToRecord')}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
