@@ -21,6 +21,7 @@ export default function RecordScreen() {
   const { t } = useTranslation();
   const textSizes = useTextSize();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const {
     isRecording,
@@ -34,22 +35,39 @@ export default function RecordScreen() {
   const recentRecordings = recordings.slice(0, 3);
 
   const handleRecordPress = async () => {
+    // Prevent double-tap issues
+    if (isProcessing) {
+      console.log('Already processing, ignoring tap');
+      return;
+    }
+
     setErrorMsg(null);
+    setIsProcessing(true);
 
     try {
       if (isRecording) {
+        console.log('Stopping recording...');
         const result = await stopRecording();
+        console.log('Stop result:', result);
         if (result.success && result.recording) {
           router.push(`/recording/${result.recording.id}`);
         }
       } else {
+        console.log('Starting recording...');
         const result = await startRecording();
+        console.log('Start result:', result);
         if (!result.success) {
           setErrorMsg(result.error || t('recordingError'));
         }
       }
     } catch (error: any) {
+      console.error('Recording error:', error);
       setErrorMsg(error?.message || String(error));
+    } finally {
+      // Add a small delay before allowing another press
+      setTimeout(() => {
+        setIsProcessing(false);
+      }, 500);
     }
   };
 
@@ -91,6 +109,7 @@ export default function RecordScreen() {
             isRecording={isRecording}
             onPress={handleRecordPress}
             audioLevel={audioLevel}
+            disabled={isProcessing}
           />
         </View>
 
