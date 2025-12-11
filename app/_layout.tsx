@@ -1,9 +1,9 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
@@ -49,8 +49,19 @@ function RootLayoutNav() {
   );
   const router = useRouter();
   const segments = useSegments();
+  const navigationState = useRootNavigationState();
+  const [isNavigationReady, setIsNavigationReady] = useState(false);
+
+  // Wait for navigation to be ready
+  useEffect(() => {
+    if (navigationState?.key) {
+      setIsNavigationReady(true);
+    }
+  }, [navigationState?.key]);
 
   useEffect(() => {
+    if (!isNavigationReady) return;
+
     const inOnboarding = segments[0] === 'onboarding';
 
     if (!hasCompletedOnboarding && !inOnboarding) {
@@ -58,7 +69,7 @@ function RootLayoutNav() {
     } else if (hasCompletedOnboarding && inOnboarding) {
       router.replace('/(tabs)');
     }
-  }, [hasCompletedOnboarding, segments, router]);
+  }, [hasCompletedOnboarding, segments, router, isNavigationReady]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
@@ -75,10 +86,7 @@ function RootLayoutNav() {
             headerTitle: '',
           }}
         />
-        <Stack.Screen
-          name="modal"
-          options={{ presentation: 'modal' }}
-        />
+        <Stack.Screen name="+not-found" />
       </Stack>
     </ThemeProvider>
   );
