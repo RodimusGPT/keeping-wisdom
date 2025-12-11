@@ -97,6 +97,8 @@ export const translations = {
     deleteOldRecordings: '請刪除舊錄音以騰出空間',
     errorOccurred: '發生錯誤',
     tryAgain: '再試一次',
+    recordingError: '無法開始錄音',
+    microphonePermissionDenied: '請允許使用麥克風',
 
     // Time formats
     today: '今天',
@@ -206,6 +208,8 @@ export const translations = {
     deleteOldRecordings: 'Please delete old recordings to free up space',
     errorOccurred: 'An error occurred',
     tryAgain: 'Try again',
+    recordingError: 'Could not start recording',
+    microphonePermissionDenied: 'Please allow microphone access',
 
     // Time formats
     today: 'Today',

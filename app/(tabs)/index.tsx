@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,8 @@ export default function RecordScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const textSizes = useTextSize();
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   const {
     isRecording,
     recordingDuration,
@@ -32,14 +34,22 @@ export default function RecordScreen() {
   const recentRecordings = recordings.slice(0, 3);
 
   const handleRecordPress = async () => {
-    if (isRecording) {
-      const result = await stopRecording();
-      if (result.success && result.recording) {
-        // Navigate to the new recording
-        router.push(`/recording/${result.recording.id}`);
+    setErrorMsg(null);
+
+    try {
+      if (isRecording) {
+        const result = await stopRecording();
+        if (result.success && result.recording) {
+          router.push(`/recording/${result.recording.id}`);
+        }
+      } else {
+        const result = await startRecording();
+        if (!result.success) {
+          setErrorMsg(result.error || t('recordingError'));
+        }
       }
-    } else {
-      await startRecording();
+    } catch (error: any) {
+      setErrorMsg(error?.message || String(error));
     }
   };
 
@@ -63,6 +73,13 @@ export default function RecordScreen() {
             {t('appName')}
           </Text>
         </View>
+
+        {/* Error Message */}
+        {errorMsg && (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorText}>{errorMsg}</Text>
+          </View>
+        )}
 
         {/* Recording Section */}
         <View style={styles.recordingSection}>
@@ -181,5 +198,16 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     color: Colors.light.textSecondary,
     textAlign: 'center',
+  },
+  errorBox: {
+    backgroundColor: '#ffebee',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  errorText: {
+    color: '#c62828',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
